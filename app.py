@@ -106,7 +106,7 @@ def upload_form():
     return '''
     <!doctype html>
     <title>Hello Natalia! Upload your CSV to continue.</title>
-    <h1>Upload CSV</h1>
+    <h1>Hello Natalia! Upload your CSV to continue.</h1>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
       <input type=submit value=Upload>
@@ -128,7 +128,7 @@ def upload_file():
         return f'''
         <!doctype html>
         <title>Success!</title>
-        <h1>You did it!</h1>
+        <h1>Success!/h1>
         <p>Look how much time you saved. Download the CSVs below:</p>
         <a href="/download/{os.path.basename(avg_csv_path)}">Download Average LTV CSV</a><br>
         <a href="/download/{os.path.basename(total_csv_path)}">Download Total Monthly Revenue CSV</a><br>
