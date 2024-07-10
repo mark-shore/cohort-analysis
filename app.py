@@ -105,7 +105,7 @@ def process_csv(file_path):
 def upload_form():
     return '''
     <!doctype html>
-    <title>Upload CSV</title>
+    <title>Hello Natalia! Upload your CSV to continue.</title>
     <h1>Upload CSV</h1>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
@@ -127,9 +127,9 @@ def upload_file():
         avg_csv_path, total_csv_path, repeat_csv_path = process_csv(file_path)
         return f'''
         <!doctype html>
-        <title>Upload CSV</title>
-        <h1>Upload CSV</h1>
-        <p>Files processed successfully. Download the results below:</p>
+        <title>Success!</title>
+        <h1>You did it!</h1>
+        <p>Look how much time you saved. Download the CSVs below:</p>
         <a href="/download/{os.path.basename(avg_csv_path)}">Download Average LTV CSV</a><br>
         <a href="/download/{os.path.basename(total_csv_path)}">Download Total Monthly Revenue CSV</a><br>
         <a href="/download/{os.path.basename(repeat_csv_path)}">Download Repeat Purchase Rate CSV</a><br>
