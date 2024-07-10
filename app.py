@@ -27,11 +27,11 @@ def process_csv(file_path):
     df['purchase_date'] = pd.to_datetime(df['purchase_date'])
 
     # Find the first purchase date for each customer
-    first_purchase = df.groupby('email')['purchase_date'].min().reset_index()
-    first_purchase.columns = ['email', 'first_purchase_date']
+    first_purchase = df.groupby('customer_email')['purchase_date'].min().reset_index()
+    first_purchase.columns = ['customer_email', 'first_purchase_date']
 
     # Merge the first purchase date back into the original DataFrame
-    df = pd.merge(df, first_purchase, on='email')
+    df = pd.merge(df, first_purchase, on='customer_email')
 
     # Calculate the cohort month
     df['cohort_month'] = df['first_purchase_date'].dt.to_period('M')
@@ -49,7 +49,7 @@ def process_csv(file_path):
     cohort_monthly_spend['cumulative_total_spent'] = cohort_monthly_spend.groupby('cohort_month')['total_sales'].cumsum()
 
     # Calculate the number of unique customers in each cohort
-    cohort_sizes = df.groupby('cohort_month')['email'].nunique().reset_index()
+    cohort_sizes = df.groupby('cohort_month')['customer_email'].nunique().reset_index()
     cohort_sizes.columns = ['cohort_month', 'cohort_size']
 
     # Merge the cohort sizes with the cumulative spend data
@@ -80,7 +80,7 @@ def process_csv(file_path):
     df['is_repeat_purchase'] = df['purchase_date'] > df['first_purchase_date']
 
     # Calculate the number of repeat purchasers by cohort and purchase month
-    repeat_purchasers = df[df['is_repeat_purchase']].groupby(['cohort_month', 'purchase_month'])['email'].nunique().reset_index()
+    repeat_purchasers = df[df['is_repeat_purchase']].groupby(['cohort_month', 'purchase_month'])['customer_email'].nunique().reset_index()
     repeat_purchasers.columns = ['cohort_month', 'purchase_month', 'repeat_purchasers']
 
     # Merge repeat purchasers with cohort sizes to calculate the repeat purchase rate
