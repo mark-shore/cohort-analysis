@@ -111,8 +111,9 @@ def process_csv(file_path):
 def upload_form():
     return '''
     <!doctype html>
-    <title>Hello Natalia! Upload your CSV to continue.</title>
-    <h1>Hello Natalia! Upload your CSV to continue.</h1>
+    <title>Cohort Analysis Upload</title>
+    <h1>Shopify Cohort Analysis</h1>
+    <p>Upload your Shopify data to analyze cohorts</p>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
       <input type=submit value=Upload>
@@ -133,9 +134,9 @@ def upload_file():
         avg_csv_path, total_csv_path, repeat_csv_path, cohort_sizes_csv_path = process_csv(file_path)
         return f'''
         <!doctype html>
-        <title>Success!</title>
+        <title>Cohort Analysis Download</title>
         <h1>Success!</h1>
-        <p>Look how much time you saved. Download the CSVs below:</p>
+        <p>Look how much time you saved. Download your CSVs below:</p>
         <a href="{url_for('download_file', filename=os.path.basename(avg_csv_path))}">Download Average LTV CSV</a><br>
         <a href="{url_for('download_file', filename=os.path.basename(total_csv_path))}">Download Total Monthly Revenue CSV</a><br>
         <a href="{url_for('download_file', filename=os.path.basename(repeat_csv_path))}">Download Repeat Purchase Rate CSV</a><br>
