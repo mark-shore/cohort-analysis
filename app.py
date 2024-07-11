@@ -42,6 +42,9 @@ def process_csv(file_path):
     # Ensure total_sales is float for calculations
     df['total_sales'] = df['total_sales'].astype(float)
 
+    # Create a customer type column
+    df['customer_type'] = df.apply(lambda x: 'New' if x['purchase_date'] == x['first_purchase_date'] else 'Returning', axis=1)
+
     # Calculate the total amount spent by each cohort in each month
     cohort_monthly_spend = df.groupby(['cohort_month', 'purchase_month'])['total_sales'].sum().reset_index()
 
@@ -79,18 +82,11 @@ def process_csv(file_path):
     cohort_sizes_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'cohort_sizes.csv')
     cohort_sizes.to_csv(cohort_sizes_csv_path, index=False)
 
-    # Calculate repeat purchase rate
-    # Create a column to track if it's a repeat purchase
-    df['is_repeat_purchase'] = df['purchase_date'] > df['first_purchase_date']
+    # Filter out first purchases to identify repeat purchases
+    repeat_purchases = df[df['customer_type'] == 'Returning']
 
-    # Sort by customer and purchase date to rank purchases within each day
-    df = df.sort_values(by=['customer_email', 'purchase_date'])
-    df['purchase_rank'] = df.groupby(['customer_email', df['purchase_date'].dt.date]).cumcount() + 1
-
-    # Consider only the first purchase of each day for repeat purchase calculation
-    unique_purchases = df[df['purchase_rank'] == 1]
-
-    repeat_purchasers = unique_purchases[unique_purchases['is_repeat_purchase']].groupby(['cohort_month', 'purchase_month'])['customer_email'].nunique().reset_index()
+    # Calculate the number of repeat purchasers by cohort and purchase month
+    repeat_purchasers = repeat_purchases.groupby(['cohort_month', 'purchase_month'])['customer_email'].nunique().reset_index()
     repeat_purchasers.columns = ['cohort_month', 'purchase_month', 'repeat_purchasers']
 
     # Merge repeat purchasers with cohort sizes to calculate the repeat purchase rate
