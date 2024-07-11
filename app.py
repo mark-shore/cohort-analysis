@@ -136,10 +136,10 @@ def upload_file():
         <title>Success!</title>
         <h1>Success!</h1>
         <p>Look how much time you saved. Download the CSVs below:</p>
-        <a href="/download/{os.path.basename(avg_csv_path)}">Download Average LTV CSV</a><br>
-        <a href="/download/{os.path.basename(total_csv_path)}">Download Total Monthly Revenue CSV</a><br>
-        <a href="/download/{os.path.basename(repeat_csv_path)}">Download Repeat Purchase Rate CSV</a><br>
-        <a href="/download/{os.path.basename(cohort_sizes_csv_path)}">Download Cohort Sizes CSV</a><br>
+        <a href="{url_for('download_file', filename=os.path.basename(avg_csv_path))}">Download Average LTV CSV</a><br>
+        <a href="{url_for('download_file', filename=os.path.basename(total_csv_path))}">Download Total Monthly Revenue CSV</a><br>
+        <a href="{url_for('download_file', filename=os.path.basename(repeat_csv_path))}">Download Repeat Purchase Rate CSV</a><br>
+        <a href="{url_for('download_file', filename=os.path.basename(cohort_sizes_csv_path))}">Download Cohort Sizes CSV</a><br>
         <a href="/">Upload another file</a>
         '''
     return redirect(request.url)
