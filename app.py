@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect, url_for, send_file
+from flask import Flask, request, redirect, url_for, render_template, send_file
 from werkzeug.utils import secure_filename
 import pandas as pd
 
@@ -16,7 +16,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def process_csv(file_path):
-    # Read the uploaded CSV file
     df = pd.read_csv(file_path)
 
     # Extract only the first 4 columns
@@ -41,9 +40,6 @@ def process_csv(file_path):
 
     # Ensure total_sales is float for calculations
     df['total_sales'] = df['total_sales'].astype(float)
-
-    # Create a customer type column
-    df['customer_type'] = df.apply(lambda x: 'New' if x['purchase_date'] == x['first_purchase_date'] else 'Returning', axis=1)
 
     # Calculate the total amount spent by each cohort in each month
     cohort_monthly_spend = df.groupby(['cohort_month', 'purchase_month'])['total_sales'].sum().reset_index()
@@ -78,15 +74,12 @@ def process_csv(file_path):
     total_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'revenue_monthly.csv')
     revenue.to_csv(total_csv_path)
 
-    # Save cohort sizes to a CSV file
-    cohort_sizes_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'cohort_sizes.csv')
-    cohort_sizes.to_csv(cohort_sizes_csv_path, index=False)
-
-    # Filter out first purchases to identify repeat purchases
-    repeat_purchases = df[df['customer_type'] == 'Returning']
+    # Calculate repeat purchase rate
+    # Create a column to track if it's a repeat purchase
+    df['is_repeat_purchase'] = df['purchase_date'] > df['first_purchase_date']
 
     # Calculate the number of repeat purchasers by cohort and purchase month
-    repeat_purchasers = repeat_purchases.groupby(['cohort_month', 'purchase_month'])['customer_email'].nunique().reset_index()
+    repeat_purchasers = df[df['is_repeat_purchase']].groupby(['cohort_month', 'purchase_month'])['customer_email'].nunique().reset_index()
     repeat_purchasers.columns = ['cohort_month', 'purchase_month', 'repeat_purchasers']
 
     # Merge repeat purchasers with cohort sizes to calculate the repeat purchase rate
@@ -105,20 +98,11 @@ def process_csv(file_path):
     repeat_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'repeat_purchase_rate.csv')
     repeat_purchase_rate.to_csv(repeat_csv_path)
 
-    return avg_csv_path, total_csv_path, repeat_csv_path, cohort_sizes_csv_path
+    return avg_csv_path, total_csv_path, repeat_csv_path
 
 @app.route('/')
 def upload_form():
-    return '''
-    <!doctype html>
-    <title>Cohort Analysis Upload</title>
-    <h1>Shopify Cohort Analysis</h1>
-    <p>Upload your Shopify data to analyze cohorts</p>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    return render_template('index.html')
 
 @app.route('/', methods=['POST'])
 def upload_file():
@@ -131,18 +115,8 @@ def upload_file():
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
-        avg_csv_path, total_csv_path, repeat_csv_path, cohort_sizes_csv_path = process_csv(file_path)
-        return f'''
-        <!doctype html>
-        <title>Cohort Analysis Download</title>
-        <h1>Success!</h1>
-        <p>Look how much time you saved. Download your CSVs below:</p>
-        <a href="{url_for('download_file', filename=os.path.basename(avg_csv_path))}">Download Average LTV CSV</a><br>
-        <a href="{url_for('download_file', filename=os.path.basename(total_csv_path))}">Download Total Monthly Revenue CSV</a><br>
-        <a href="{url_for('download_file', filename=os.path.basename(repeat_csv_path))}">Download Repeat Purchase Rate CSV</a><br>
-        <a href="{url_for('download_file', filename=os.path.basename(cohort_sizes_csv_path))}">Download Cohort Sizes CSV</a><br>
-        <a href="/">Upload another file</a>
-        '''
+        avg_csv_path, total_csv_path, repeat_csv_path = process_csv(file_path)
+        return render_template('index.html', avg_csv_path=avg_csv_path, total_csv_path=total_csv_path, repeat_csv_path=repeat_csv_path)
     return redirect(request.url)
 
 @app.route('/download/<filename>')
