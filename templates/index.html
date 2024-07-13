@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload CSV for Cohort Analysis</title>
+    <title>MarOps Studio Cohort Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Upload CSV for Cohort Analysis</h1>
+    <div class="container">
+        <h1>Upload CSV for Cohort Analysis</h1>
         <form method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="file">Choose CSV file</label>
-                <input type="file" class="form-control" id="file" name="file">
-            </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
+            <p>Choose CSV file</p>
+            <input type="file" name="file" />
+            <button type="submit">Upload</button>
         </form>
         {% if avg_csv_path and total_csv_path and repeat_csv_path %}
-            <h2 class="mt-5">Download Results</h2>
-            <ul>
-                <li><a href="{{ url_for('download_file', filename=avg_csv_path.split('/')[-1]) }}">Download Average LTV CSV</a></li>
-                <li><a href="{{ url_for('download_file', filename=total_csv_path.split('/')[-1]) }}">Download Total Monthly Revenue CSV</a></li>
-                <li><a href="{{ url_for('download_file', filename=repeat_csv_path.split('/')[-1]) }}">Download Repeat Purchase Rate CSV</a></li>
-            </ul>
+        <div class="download-results">
+            <h2>Download Results</h2>
+            <a href="{{ url_for('download_file', filename=avg_csv_path.split('/')[-1]) }}">Download Average LTV CSV</a>
+            <a href="{{ url_for('download_file', filename=total_csv_path.split('/')[-1]) }}">Download Total Monthly Revenue CSV</a>
+            <a href="{{ url_for('download_file', filename=repeat_csv_path.split('/')[-1]) }}">Download Repeat Purchase Rate CSV</a>
+        </div>
         {% endif %}
     </div>
+    <footer>&copy; 2024 MarOps Studio</footer>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>
