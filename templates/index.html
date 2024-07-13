@@ -4,27 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MarOps Studio Cohort Analysis</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .initial-screen {
+            display: block;
+        }
+        .results-screen {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>MarOps Studio Cohort Analysis</h1>
-        <form method="post" enctype="multipart/form-data">
-            <p>Upload CSV file for automated cohort analysis</p>
-            <input type="file" name="file" />
-            <button type="submit">Upload</button>
-        </form>
-        {% if avg_csv_path and total_csv_path and repeat_csv_path %}
-        <div class="download-results">
-            <h2>Download Results</h2>
-            <a href="{{ url_for('download_file', filename=avg_csv_path.split('/')[-1]) }}">Download Average LTV CSV</a>
-            <a href="{{ url_for('download_file', filename=total_csv_path.split('/')[-1]) }}">Download Total Monthly Revenue CSV</a>
-            <a href="{{ url_for('download_file', filename=repeat_csv_path.split('/')[-1]) }}">Download Repeat Purchase Rate CSV</a>
+        <div class="initial-screen">
+            <form id="upload-form" method="post" enctype="multipart/form-data">
+                <p>Upload CSV file for automated cohort analysis</p>
+                <input type="file" name="file" />
+                <button type="submit">Upload</button>
+            </form>
         </div>
-        {% endif %}
+        <div class="results-screen" id="results-screen">
+            {% if avg_csv_path and total_csv_path and repeat_csv_path %}
+            <div class="download-results">
+                <h2>Download Results</h2>
+                <a href="{{ url_for('download_file', filename=avg_csv_path.split('/')[-1]) }}">Download Average LTV CSV</a>
+                <a href="{{ url_for('download_file', filename=total_csv_path.split('/')[-1]) }}">Download Total Monthly Revenue CSV</a>
+                <a href="{{ url_for('download_file', filename=repeat_csv_path.split('/')[-1]) }}">Download Repeat Purchase Rate CSV</a>
+            </div>
+            {% endif %}
+            <button id="back-to-upload" onclick="goBackToUpload()">Upload Another File</button>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        function goBackToUpload() {
+            document.querySelector('.initial-screen').style.display = 'block';
+            document.querySelector('.results-screen').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
