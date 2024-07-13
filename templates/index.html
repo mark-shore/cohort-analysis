@@ -6,13 +6,34 @@
     <title>MarOps Studio Cohort Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Style for drop area */
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #drop-area.highlight {
+            border-color: purple;
+        }
+        #gallery img {
+            width: 100px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>MarOps Studio Cohort Analysis</h1>
-        <form method="post" enctype="multipart/form-data">
-            <p>Upload CSV file for automated cohort analysis</p>
-            <input type="file" name="file" />
+        <div id="drop-area" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+            <p>Drag and drop CSV file here, or click to select file</p>
+        </div>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <input type="file" id="fileElem" name="file" style="display:none;" />
             <button type="submit">Upload</button>
         </form>
         {% if avg_csv_path and total_csv_path and repeat_csv_path %}
@@ -25,5 +46,23 @@
         {% endif %}
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        function handleDragOver(event) {
+            event.preventDefault();
+            dropArea.classList.add('highlight');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            dropArea.classList.remove('highlight');
+            let files = event.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            document.getElementById('fileElem').files = files;
+            document.getElementById('upload-form').submit();
+        }
+    </script>
 </body>
 </html>
