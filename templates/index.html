@@ -16,12 +16,13 @@
             <input type="file" name="file" />
             <button type="submit">Upload</button>
         </form>
-        {% if avg_csv_path and total_csv_path and repeat_csv_path %}
+        {% if avg_csv_path and total_csv_path and repeat_csv_path and cohort_sizes_csv_path %}
         <div class="download-results">
             <h2>Download Results</h2>
             <a href="{{ url_for('download_file', filename=avg_csv_path.split('/')[-1]) }}">Download Average LTV CSV</a>
             <a href="{{ url_for('download_file', filename=total_csv_path.split('/')[-1]) }}">Download Total Monthly Revenue CSV</a>
             <a href="{{ url_for('download_file', filename=repeat_csv_path.split('/')[-1]) }}">Download Repeat Purchase Rate CSV</a>
+            <a href="{{ url_for('download_file', filename=cohort_sizes_csv_path.split('/')[-1]) }}">Download Cohort Sizes CSV</a>
         </div>
         {% endif %}
     </div>

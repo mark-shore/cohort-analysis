@@ -51,6 +51,10 @@ def process_csv(file_path):
     cohort_sizes = df.groupby('cohort_month')['customer_email'].nunique().reset_index()
     cohort_sizes.columns = ['cohort_month', 'cohort_size']
 
+    # Save the cohort sizes to a CSV file
+    cohort_sizes_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'cohort_sizes.csv')
+    cohort_sizes.to_csv(cohort_sizes_csv_path, index=False)
+
     # Merge the cohort sizes with the cumulative spend data
     cohort_monthly_spend = pd.merge(cohort_monthly_spend, cohort_sizes, on='cohort_month')
 
@@ -98,7 +102,7 @@ def process_csv(file_path):
     repeat_csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'repeat_purchase_rate.csv')
     repeat_purchase_rate.to_csv(repeat_csv_path)
 
-    return avg_csv_path, total_csv_path, repeat_csv_path
+    return avg_csv_path, total_csv_path, repeat_csv_path, cohort_sizes_csv_path
 
 @app.route('/')
 def upload_form():
@@ -115,8 +119,8 @@ def upload_file():
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
-        avg_csv_path, total_csv_path, repeat_csv_path = process_csv(file_path)
-        return render_template('index.html', avg_csv_path=avg_csv_path, total_csv_path=total_csv_path, repeat_csv_path=repeat_csv_path)
+        avg_csv_path, total_csv_path, repeat_csv_path, cohort_sizes_csv_path = process_csv(file_path)
+        return render_template('index.html', avg_csv_path=avg_csv_path, total_csv_path=total_csv_path, repeat_csv_path=repeat_csv_path, cohort_sizes_csv_path=cohort_sizes_csv_path)
     return redirect(request.url)
 
 @app.route('/download/<filename>')
